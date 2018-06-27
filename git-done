@@ -1,15 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -eou pipefail
+set -euo pipefail
 
-JIRATAG=$(git rev-parse --abbrev-ref HEAD | grep -Eo '[A-Z]+-[0-9]+' || true)
+JIRATAG=$(git rev-parse --abbrev-ref HEAD | grep -Eo '[A-Z]+-[0-9]+')
 
-if ! [ "$JIRATAG" ]; then
+if [[ -z $JIRATAG ]]; then
+    echo "Can not find JIRA tag in branch name" 1>&2
     exit 0
 fi
 
-SUBJECT="$(git show -s --pretty=tformat:%s | sed "s/^${JIRATAG} //")"
-BODY="$(git show -s --pretty=tformat:%b)"
+SUBJECT=$(git show -s --pretty=tformat:%s | sed "s/^${JIRATAG} //")
+BODY=$(git show -s --pretty=tformat:%b)
 
 git commit --amend -m "${SUBJECT}" -m "${BODY}" -m "${JIRATAG} #done"
-exit 0
